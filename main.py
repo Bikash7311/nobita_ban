@@ -15,14 +15,16 @@ API_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
 MANDATORY_CHANNEL = "@nobitabanxunban"
 BOT_USERNAME = "Nobita_banbot"
 OWNER_USERNAME = "Znonsence"
-OWNER_ID = 6132146801  # Aapki Numeric Telegram ID
+OWNER_ID = 6132146801  # Numeric Telegram ID
 
 REQUIRED_REFERRALS = 10
 COOLDOWN_TIME = 900  # 15 Minutes = 900 Seconds
 
 DB_FILE = "nobita_bot.db"
 BANNER_URL = "https://raw.githubusercontent.com/Bikash7311/upi-giveway22/main/file_00000000699c72078bf5815b0d1a0995.png"
-ANIME_LOADER_URL = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3h5Z3E2ZzRxdWZzZXZ0aWJjbmV4Znd4aGZzcnN2bnR5ZzlyZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Lq0h93752f6J9tijrh/giphy.gif"
+
+# Updated to Action / Mafia Style GIF Loader
+ANIME_LOADER_URL = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbnFlcWs4d3N3enN2dWdrNm5icmdsbTZwdjJzcmJjYW9ndTllZXhmdSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/L5aXbsMT2N7b2/giphy.gif"
 
 user_states = {}
 
@@ -131,7 +133,6 @@ def update_last_action_time(user_id):
   conn.close()
 
 
-# Manual Premium Management Functions
 def add_manual_premium(user_id):
   conn = sqlite3.connect(DB_FILE)
   cursor = conn.cursor()
@@ -295,7 +296,7 @@ def answer_callback_query(callback_query_id, text):
 
 
 # =========================================
-# KEYBOARDS (STYLISH BUTTONS)
+# KEYBOARDS
 # =========================================
 def get_main_menu_keyboard(user_id):
   ref_count = get_referral_count(user_id)
@@ -310,7 +311,10 @@ def get_main_menu_keyboard(user_id):
               {"text": "🔓 ᴜɴʙᴀɴ ᴛᴀʀɢᴇᴛ", "callback_data": "action_unban"},
           ],
           [
-              {"text": "🔍 sᴛᴀᴛᴜs ᴄʜᴇᴄᴋᴇʀ", "callback_data": "action_status_check"},
+              {
+                  "text": "💎 ɢᴇᴛ ᴘʀᴇᴍɪᴜᴍ",
+                  "callback_data": "action_get_premium",
+              },
               {"text": "⚙️ sʏsᴛᴇᴍ sᴛᴀᴛᴜs", "callback_data": "action_bot_status"},
           ],
           [
@@ -341,6 +345,18 @@ def get_back_keyboard():
   }
 
 
+def get_buy_premium_keyboard():
+  return {
+      "inline_keyboard": [
+          [{
+              "text": "💬 ᴄᴏɴᴛᴀᴄᴛ ᴏᴡɴᴇʀ",
+              "url": f"https://t.me/{OWNER_USERNAME}",
+          }],
+          [{"text": "🔙 ʙᴀᴄᴋ ᴛᴏ ᴍᴀɪɴ ᴍᴇɴᴜ", "callback_data": "go_back"}],
+      ]
+  }
+
+
 def get_join_keyboard():
   return {
       "inline_keyboard": [
@@ -354,14 +370,14 @@ def get_join_keyboard():
 
 
 # =========================================
-# 10-SECOND ANIME LOADER ENGINE
+# 10-SECOND ACTION LOADER ENGINE
 # =========================================
 def run_10s_anime_animation(chat_id, action_title, target_number):
   init_caption = (
-      f"⚡ <b>[ ANIME CORE ENGINE ACTIVATING ]</b> ⚡\n"
+      f"🔥 <b>[ MAFIA CORE ENGINE ACTIVATING ]</b> 🔥\n"
       f"🎯 <b>Action:</b> <code>{action_title}</code>\n"
       f"📞 <b>Target:</b> <code>{target_number}</code>\n\n"
-      f"⏳ <code>[▒▒▒▒▒▒▒▒▒▒] 0%</code> — Initializing System Gateway..."
+      f"⏳ <code>[▒▒▒▒▒▒▒▒▒▒] 0%</code> — Initializing Action Gateway..."
   )
 
   msg_id = send_animation(
@@ -369,16 +385,16 @@ def run_10s_anime_animation(chat_id, action_title, target_number):
   )
 
   stages = [
-      (20, "██▒▒▒▒▒▒▒▒", "Bypassing Network Security..."),
-      (45, "█████▒▒▒▒▒", "Injecting Anime Payload..."),
-      (75, "████████▒▒", "Synchronizing Bot Database..."),
-      (100, "██████████", "Execution Completed Successfully!"),
+      (25, "███▒▒▒▒▒▒▒", "Overriding Node Defenses..."),
+      (50, "█████▒▒▒▒▒", "Deploying Heavy Payload..."),
+      (80, "████████▒▒", "Executing Network Strike..."),
+      (100, "██████████", "Target Operations Complete!"),
   ]
 
   for percent, bar, status in stages:
-    time.sleep(2.5)  # 4 x 2.5s = 10 Seconds
+    time.sleep(2.5)
     updated_caption = (
-        f"⚡ <b>[ ANIME CORE ENGINE ACTIVATING ]</b> ⚡\n"
+        f"🔥 <b>[ MAFIA CORE ENGINE ACTIVATING ]</b> 🔥\n"
         f"🎯 <b>Action:</b> <code>{action_title}</code>\n"
         f"📞 <b>Target:</b> <code>{target_number}</code>\n\n"
         f"⏳ <code>[{bar}] {percent}%</code> — {status}"
@@ -394,7 +410,6 @@ def handle_message(message):
   user_id = message["from"]["id"]
   user_text = message.get("text", "").strip()
 
-  # ---------------- OWNER CONTROL COMMANDS ----------------
   if user_text == "/stats" and user_id == OWNER_ID:
     all_users = get_all_users()
     manual_prems = get_all_manual_premium()
@@ -521,7 +536,7 @@ def handle_message(message):
   if user_text.startswith("/start"):
     ref_count = get_referral_count(user_id)
     status_str = (
-        "💎 ᴘʀᴇᴍɪᴜ繆 ᴀᴄᴄᴇss"
+        "💎 ᴘʀᴇᴍɪᴜᴍ ᴀᴄᴄᴇss"
         if has_premium_access(user_id)
         else "🔒 ғʀᴇᴇ ᴛɪᴇʀ (Needs 10 Invites)"
     )
@@ -554,26 +569,21 @@ def handle_message(message):
       "temp_ban_input",
       "mass_report_input",
       "unban_input",
-      "status_check_input",
   ]:
     if user_text.startswith("+") and len(user_text) >= 10:
 
       update_last_action_time(user_id)
 
-      # Determine Action Name
       action_names = {
           "perm_ban_input": "Permanent Ban",
           "temp_ban_input": "Temporary Ban",
           "mass_report_input": "Mass Report",
           "unban_input": "Unban Execution",
-          "status_check_input": "Status Checker",
       }
       action_name = action_names.get(current_state, "System Action")
 
-      # Trigger 10-Second Anime Loader
       run_10s_anime_animation(chat_id, action_name, user_text)
 
-      # Output Final Result Message
       if current_state == "perm_ban_input":
         res_text = (
             "╭───────────────────────╮\n"
@@ -601,7 +611,7 @@ def handle_message(message):
             "🛡️ <b>Status:</b> Dispatched across 50+ network nodes.\n\n"
             "⏳ <i>Server Cooldown: 15 minutes lock active.</i>"
         )
-      elif current_state == "unban_input":
+      else:
         res_text = (
             "╭───────────────────────╮\n"
             "   🔓 <b>[ ᴜɴʙᴀɴ ᴇxᴇᴄᴜᴛᴇᴅ ]</b>\n"
@@ -609,14 +619,6 @@ def handle_message(message):
             f"🎯 <b>Target Number:</b> <code>{user_text}</code>\n"
             "🛡️ <b>Status:</b> Account restrictions cleared.\n\n"
             "⏳ <i>Server Cooldown: 15 minutes lock active.</i>"
-        )
-      else:
-        res_text = (
-            "╭───────────────────────╮\n"
-            "   🔍 <b>[ sᴛᴀᴛᴜs ʀᴇᴘᴏʀᴛ ]</b>\n"
-            "╰───────────────────────╯\n\n"
-            f"🎯 <b>Target Number:</b> <code>{user_text}</code>\n"
-            "📊 <b>Result:</b> Target actively flagged under review."
         )
 
       send_message(
@@ -787,17 +789,26 @@ def handle_callback(callback):
     )
     user_states[chat_id] = "unban_input"
 
-  elif data == "action_status_check":
-    answer_callback_query(callback_id, "Status Checker")
+  elif data == "action_get_premium":
+    answer_callback_query(callback_id, "VIP Pricing")
+    premium_pricing_text = (
+        "👑 ─────── <b>[ ᴘʀᴇᴍɪᴜᴍ ᴀᴄᴄᴇss VIP ]</b> ─────── 👑\n\n"
+        "<blockquote>Unlock unlimited access to all Permanent Ban, Temporary"
+        " Ban & Mass Report tools without referral restrictions!</blockquote>\n\n"
+        "┌── 💎 <b><u>OFFICIAL PRICING</u></b>\n"
+        "├ 🇮🇳 <b>INR (UPI):</b> <code>₹799 RS</code>\n"
+        "├ 🌐 <b>USDT (Crypto):</b> <code>$9 USDT</code>\n"
+        "└ ⚡ <b>Validity:</b> <code>Lifetime Premium VIP Access</code>\n\n"
+        "❖ ───────────────────────────── ❖\n"
+        f"📩 <b>CONTACT OWNER:</b> @{OWNER_USERNAME}"
+    )
     edit_message_text(
         chat_id,
         message_id,
-        "🔍 <b>[ sᴛᴀᴛᴜs ᴄʜᴇᴄᴋᴇʀ ]</b>\n\n<i>Enter target number to verify ban"
-        " status:</i>",
-        reply_markup=get_back_keyboard(),
+        premium_pricing_text,
+        reply_markup=get_buy_premium_keyboard(),
         parse_mode="HTML",
     )
-    user_states[chat_id] = "status_check_input"
 
   elif data == "action_bot_status":
     answer_callback_query(callback_id, "System Online")
