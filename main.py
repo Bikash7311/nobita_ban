@@ -15,15 +15,13 @@ API_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
 MANDATORY_CHANNEL = "@nobitabanxunban"
 BOT_USERNAME = "Nobita_banbot"
 OWNER_USERNAME = "Znonsence"
-OWNER_ID = 6132146801  # Numeric Telegram ID
+OWNER_ID = 6132146801
 
-REQUIRED_REFERRALS = 10
-COOLDOWN_TIME = 900  # 15 Minutes = 900 Seconds
+REQUIRED_REFERRALS = 15  # Updated from 10 to 15 Referrals
+COOLDOWN_TIME = 900  # 15 Minutes
 
 DB_FILE = "nobita_bot.db"
 BANNER_URL = "https://raw.githubusercontent.com/Bikash7311/upi-giveway22/main/file_00000000699c72078bf5815b0d1a0995.png"
-
-# Updated to Action / Mafia Style GIF Loader
 ANIME_LOADER_URL = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbnFlcWs4d3N3enN2dWdrNm5icmdsbTZwdjJzcmJjYW9ndTllZXhmdSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/L5aXbsMT2N7b2/giphy.gif"
 
 user_states = {}
@@ -286,9 +284,13 @@ def edit_message_caption(
     pass
 
 
-def answer_callback_query(callback_query_id, text):
+def answer_callback_query(callback_query_id, text, show_alert=False):
   url = API_URL + "/answerCallbackQuery"
-  payload = {"callback_query_id": callback_query_id, "text": text}
+  payload = {
+      "callback_query_id": callback_query_id,
+      "text": text,
+      "show_alert": show_alert,
+  }
   try:
     requests.post(url, data=payload, timeout=10)
   except:
@@ -303,34 +305,36 @@ def get_main_menu_keyboard(user_id):
   return {
       "inline_keyboard": [
           [
-              {"text": "⚡ ᴘᴇʀᴍᴀɴᴇɴᴛ ʙᴀɴ", "callback_data": "action_perm_ban"},
-              {"text": "⏳ ᴛᴇᴍᴘᴏʀᴀʀʏ ʙᴀɴ", "callback_data": "action_temp_ban"},
-          ],
-          [
-              {"text": "🚨 ᴍᴀss ʀᴇᴘᴏʀᴛ", "callback_data": "action_mass_report"},
-              {"text": "🔓 ᴜɴʙᴀɴ ᴛᴀʀɢᴇᴛ", "callback_data": "action_unban"},
+              {"text": "💥 Permanent Ban", "callback_data": "action_perm_ban"},
+              {"text": "⏳ Temporary Ban", "callback_data": "action_temp_ban"},
           ],
           [
               {
-                  "text": "💎 ɢᴇᴛ ᴘʀᴇᴍɪᴜᴍ",
+                  "text": f"💬 Contact Owner: {OWNER_USERNAME}",
+                  "url": f"https://t.me/{OWNER_USERNAME}",
+              }
+          ],
+          [
+              {"text": "🚨 Mass Report", "callback_data": "action_mass_report"},
+              {"text": "🔓 Unban Target", "callback_data": "action_unban"},
+          ],
+          [
+              {
+                  "text": "💎 GET PREMIUM",
                   "callback_data": "action_get_premium",
               },
-              {"text": "⚙️ sʏsᴛᴇᴍ sᴛᴀᴛᴜs", "callback_data": "action_bot_status"},
+              {"text": "⚙️ System Status", "callback_data": "action_bot_status"},
           ],
           [
               {
                   "text": (
-                      f"💎 ɪɴᴠɪᴛᴇ ᴇᴀʀɴ ({ref_count}/{REQUIRED_REFERRALS})"
+                      f"🎁 Invite Earn ({ref_count}/{REQUIRED_REFERRALS})"
                   ),
                   "callback_data": "action_invite",
-              },
-              {
-                  "text": "👑 ᴏᴡɴᴇʀ",
-                  "url": f"https://t.me/{OWNER_USERNAME}",
-              },
+              }
           ],
           [{
-              "text": "🌐 ᴏғғɪᴄɪᴀʟ ᴄʜᴀɴɴᴇʟ",
+              "text": "🌐 Official Channel",
               "url": "https://t.me/nobitabanxunban",
           }],
       ]
@@ -340,7 +344,13 @@ def get_main_menu_keyboard(user_id):
 def get_back_keyboard():
   return {
       "inline_keyboard": [
-          [{"text": "🔙 ʙᴀᴄᴋ ᴛᴏ ᴍᴀɪɴ ᴍᴇɴᴜ", "callback_data": "go_back"}]
+          [
+              {
+                  "text": f"💬 DM Owner: {OWNER_USERNAME}",
+                  "url": f"https://t.me/{OWNER_USERNAME}",
+              }
+          ],
+          [{"text": "⬅️ Back to Menu", "callback_data": "go_back"}],
       ]
   }
 
@@ -348,11 +358,13 @@ def get_back_keyboard():
 def get_buy_premium_keyboard():
   return {
       "inline_keyboard": [
-          [{
-              "text": "💬 ᴄᴏɴᴛᴀᴄᴛ ᴏᴡɴᴇʀ",
-              "url": f"https://t.me/{OWNER_USERNAME}",
-          }],
-          [{"text": "🔙 ʙᴀᴄᴋ ᴛᴏ ᴍᴀɪɴ ᴍᴇɴᴜ", "callback_data": "go_back"}],
+          [
+              {
+                  "text": f"💬 DM Owner: {OWNER_USERNAME}",
+                  "url": f"https://t.me/{OWNER_USERNAME}",
+              }
+          ],
+          [{"text": "⬅️ Back to Menu", "callback_data": "go_back"}],
       ]
   }
 
@@ -361,10 +373,10 @@ def get_join_keyboard():
   return {
       "inline_keyboard": [
           [{
-              "text": "📢 ᴊᴏɪɴ ᴏғғɪᴄɪᴀʟ ᴄʜᴀɴɴᴇʟ",
+              "text": "📢 Join Official Channel",
               "url": "https://t.me/nobitabanxunban",
           }],
-          [{"text": "✅ ᴠᴇʀɪғʏ ᴍᴇᴍʙᴇʀsʜɪᴘ", "callback_data": "verify_join"}],
+          [{"text": "✅ Verify Membership", "callback_data": "verify_join"}],
       ]
   }
 
@@ -374,10 +386,10 @@ def get_join_keyboard():
 # =========================================
 def run_10s_anime_animation(chat_id, action_title, target_number):
   init_caption = (
-      f"🔥 <b>[ MAFIA CORE ENGINE ACTIVATING ]</b> 🔥\n"
+      f"⚡ <b>[ CORE ENGINE ACTIVATING ]</b> ⚡\n"
       f"🎯 <b>Action:</b> <code>{action_title}</code>\n"
       f"📞 <b>Target:</b> <code>{target_number}</code>\n\n"
-      f"⏳ <code>[▒▒▒▒▒▒▒▒▒▒] 0%</code> — Initializing Action Gateway..."
+      f"⏳ <code>[▒▒▒▒▒▒▒▒▒▒] 0%</code> — Initializing Gateway..."
   )
 
   msg_id = send_animation(
@@ -394,7 +406,7 @@ def run_10s_anime_animation(chat_id, action_title, target_number):
   for percent, bar, status in stages:
     time.sleep(2.5)
     updated_caption = (
-        f"🔥 <b>[ MAFIA CORE ENGINE ACTIVATING ]</b> 🔥\n"
+        f"⚡ <b>[ CORE ENGINE ACTIVATING ]</b> ⚡\n"
         f"🎯 <b>Action:</b> <code>{action_title}</code>\n"
         f"📞 <b>Target:</b> <code>{target_number}</code>\n\n"
         f"⏳ <code>[{bar}] {percent}%</code> — {status}"
@@ -414,7 +426,7 @@ def handle_message(message):
     all_users = get_all_users()
     manual_prems = get_all_manual_premium()
     stats_msg = (
-        "📊 ─────── <b>[ ᴅᴀᴛᴀʙᴀsᴇ sᴛᴀᴛs ]</b> ─────── 📊\n\n"
+        "📊 ─────── <b>[ DATABASE STATS ]</b> ─────── 📊\n\n"
         "┌── 📈 <b><u>SYSTEM METRICS</u></b>\n"
         f"├ 👤 <b>Total Registered Users:</b> <code>{len(all_users)}</code>\n"
         f"├ 👑 <b>Manual Premium Users:</b> <code>{len(manual_prems)}</code>\n"
@@ -478,7 +490,7 @@ def handle_message(message):
     if broadcast_msg:
       status_msg_id = send_message(
           chat_id,
-          "⏳ <b>[ ʙʀᴏᴀᴅᴄᴀsᴛ ɪɴ ᴘʀᴏɢʀᴇss ]</b>\n\n<i>Sending network"
+          "⏳ <b>[ BROADCAST IN PROGRESS ]</b>\n\n<i>Sending network"
           " signals...</i>",
           parse_mode="HTML",
       )
@@ -494,7 +506,7 @@ def handle_message(message):
       edit_message_text(
           chat_id,
           status_msg_id,
-          "✅ <b>[ ʙʀᴏᴀᴅᴄᴀsᴛ ᴄᴏᴍᴘʟᴇᴛᴇᴅ ]</b>\n\n🎯 <b>Delivered"
+          "✅ <b>[ BROADCAST COMPLETED ]</b>\n\n🎯 <b>Delivered"
           f" To:</b> <code>{sent_count}</code> users.",
           parse_mode="HTML",
       )
@@ -521,10 +533,11 @@ def handle_message(message):
   if not is_user_joined(user_id):
     join_msg = (
         "╭───────────────────────╮\n"
-        "   ⚠️ <b>ᴀᴄᴄᴇss ʀᴇsᴛʀɪᴄᴛᴇᴅ</b>\n"
+        "   ⚠️ <b>ACCESS RESTRICTED</b>\n"
         "╰───────────────────────╯\n\n"
-        "<blockquote>To access <b>NOBITA BAN x UNBAN BOT</b> features, you must"
-        " join our official network channel first.</blockquote>\n\n"
+        "<blockquote>To access <b>NOBITA BAN X UNBAN PREMIUM BOT</b>"
+        " features, you must join our official network channel"
+        " first.</blockquote>\n\n"
         "📌 <b>Channel:</b> @nobitabanxunban\n\n"
         "👇 <i>Click the verification button below after joining!</i>"
     )
@@ -536,22 +549,16 @@ def handle_message(message):
   if user_text.startswith("/start"):
     ref_count = get_referral_count(user_id)
     status_str = (
-        "💎 ᴘʀᴇᴍɪᴜᴍ ᴀᴄᴄᴇss"
+        "💎 PREMIUM ACCESS"
         if has_premium_access(user_id)
-        else "🔒 ғʀᴇᴇ ᴛɪᴇʀ (Needs 10 Invites)"
+        else f"❌ NO PREMIUM"
     )
     welcome_caption = (
-        "❖ ─────── <b>[ ɴᴏʙɪᴛᴀ ᴄᴏʀᴇ ]</b> ─────── ❖\n\n"
-        "⚡ <b>WELCOME TO NOBITA BAN x UNBAN ENGINE</b>\n\n"
-        "<blockquote>The most advanced execution module for targeted network"
-        " management and reporting.</blockquote>\n\n"
-        "┌── 📊 <b><u>USER PROFILE</u></b>\n"
-        f"├ 👤 <b>User ID:</b> <code>{user_id}</code>\n"
-        f"├ 👑 <b>Status:</b> <b>{status_str}</b>\n"
-        f"└ 🚀 <b>Referrals:</b>"
-        f" <code>{ref_count}/{REQUIRED_REFERRALS}</code>\n\n"
-        "❖ ───────────────────────────── ❖\n"
-        "👇 <i>Select an operation command below:</i>"
+        "⚡ <b>NOBITA BAN X UNBAN PREMIUM BOT</b> ⚡\n\n"
+        "Welcome! Select an option below to start:\n\n"
+        f"👤 <b>Your ID:</b> <code>{user_id}</code>\n"
+        f"👑 <b>Status:</b> <b>{status_str}</b>\n"
+        f"🚀 <b>Referrals:</b> <code>{ref_count}/{REQUIRED_REFERRALS}</code>"
     )
     send_photo(
         chat_id,
@@ -587,7 +594,7 @@ def handle_message(message):
       if current_state == "perm_ban_input":
         res_text = (
             "╭───────────────────────╮\n"
-            "   💥 <b>[ ᴘᴇʀᴍᴀɴᴇɴᴛ ʙᴀɴ sᴇɴᴛ ]</b>\n"
+            "   💥 <b>[ PERMANENT BAN SENT ]</b>\n"
             "╰───────────────────────╯\n\n"
             f"🎯 <b>Target Number:</b> <code>{user_text}</code>\n"
             "🛡️ <b>Status:</b> Payload delivered successfully.\n\n"
@@ -596,7 +603,7 @@ def handle_message(message):
       elif current_state == "temp_ban_input":
         res_text = (
             "╭───────────────────────╮\n"
-            "   ⏳ <b>[ ᴛᴇᴍᴘᴏʀᴀʀʏ ʙᴀɴ sᴇɴᴛ ]</b>\n"
+            "   ⏳ <b>[ TEMPORARY BAN SENT ]</b>\n"
             "╰───────────────────────╯\n\n"
             f"🎯 <b>Target Number:</b> <code>{user_text}</code>\n"
             "🛡️ <b>Status:</b> Restricted for 24-48 hours window.\n\n"
@@ -605,7 +612,7 @@ def handle_message(message):
       elif current_state == "mass_report_input":
         res_text = (
             "╭───────────────────────╮\n"
-            "   🚨 <b>[ ᴍᴀss ʀᴇᴘᴏʀᴛ ᴀᴄᴛɪᴠᴇ ]</b>\n"
+            "   🚨 <b>[ MASS REPORT ACTIVE ]</b>\n"
             "╰───────────────────────╯\n\n"
             f"🎯 <b>Target Number:</b> <code>{user_text}</code>\n"
             "🛡️ <b>Status:</b> Dispatched across 50+ network nodes.\n\n"
@@ -614,7 +621,7 @@ def handle_message(message):
       else:
         res_text = (
             "╭───────────────────────╮\n"
-            "   🔓 <b>[ ᴜɴʙᴀɴ ᴇxᴇᴄᴜᴛᴇᴅ ]</b>\n"
+            "   🔓 <b>[ UNBAN EXECUTED ]</b>\n"
             "╰───────────────────────╯\n\n"
             f"🎯 <b>Target Number:</b> <code>{user_text}</code>\n"
             "🛡️ <b>Status:</b> Account restrictions cleared.\n\n"
@@ -631,7 +638,7 @@ def handle_message(message):
     else:
       send_message(
           chat_id,
-          "⚠️ <b>[ ɪɴᴠᴀʟɪᴅ ғᴏʀᴍᴀᴛ ]</b>\n\nPlease send the phone number with"
+          "⚠️ <b>[ INVALID FORMAT ]</b>\n\nPlease send the phone number with"
           " country code (e.g., <code>+919876543210</code>):",
           parse_mode="HTML",
       )
@@ -654,25 +661,22 @@ def handle_callback(callback):
         if confirm_referral(referrer_id, user_id):
           send_message(
               referrer_id,
-              "🎉 <b>[ ɴᴇᴡ ʀᴇғᴇʀʀᴀʟ ]</b>\n\nA user completed verification"
+              "🎉 <b>[ NEW REFERRAL ]</b>\n\nA user completed verification"
               " through your invitation link!",
           )
 
       ref_count = get_referral_count(user_id)
       status_str = (
-          "💎 ᴘʀᴇᴍɪᴜᴍ ᴀᴄᴄᴇss"
+          "💎 PREMIUM ACCESS"
           if has_premium_access(user_id)
-          else "🔒 ғʀᴇᴇ ᴛɪᴇʀ (Needs 10 Invites)"
+          else f"❌ NO PREMIUM"
       )
       welcome_caption = (
-          "❖ ─────── <b>[ ɴᴏʙɪᴛᴀ ᴄᴏʀᴇ ]</b> ─────── ❖\n\n"
-          "┌── 📊 <b><u>USER PROFILE</u></b>\n"
-          f"├ 👤 <b>User ID:</b> <code>{user_id}</code>\n"
-          f"├ 👑 <b>Status:</b> <b>{status_str}</b>\n"
-          f"└ 🚀 <b>Referrals:</b>"
-          f" <code>{ref_count}/{REQUIRED_REFERRALS}</code>\n\n"
-          "❖ ───────────────────────────── ❖\n"
-          "👇 <i>Select an operation command below:</i>"
+          "⚡ <b>NOBITA BAN X UNBAN PREMIUM BOT</b> ⚡\n\n"
+          "Welcome! Select an option below to start:\n\n"
+          f"👤 <b>Your ID:</b> <code>{user_id}</code>\n"
+          f"👑 <b>Status:</b> <b>{status_str}</b>\n"
+          f"🚀 <b>Referrals:</b> <code>{ref_count}/{REQUIRED_REFERRALS}</code>"
       )
       send_photo(
           chat_id,
@@ -697,23 +701,27 @@ def handle_callback(callback):
       "action_unban",
   ]:
     if not has_premium_access(user_id):
-      answer_callback_query(callback_id, "🔒 Premium Access Required!")
+      answer_callback_query(
+          callback_id,
+          "NOBITA BAN X UNBAN PREMIUM BOT\nAccess Restricted!",
+          show_alert=True,
+      )
       lock_msg = (
-          "🛑 <b>[ ᴀᴄᴄᴇss ᴅᴇɴɪᴇᴅ ]</b>\n\n"
-          "<blockquote>This operational tool is exclusive to <b>Premium"
-          " Members</b>. Invite 10 friends to unlock instant access or contact"
-          " Owner.</blockquote>\n\n"
-          "┌── 📊 <b><u>PROGRESS</u></b>\n"
-          f"├ 👥 <b>Your Invites:</b> <code>{ref_count}</code> / 10\n"
-          f"└ 🎯 <b>Remaining:</b>"
-          f" <code>{REQUIRED_REFERRALS - ref_count}</code> Friends\n\n"
-          "💡 <i>Click <b>Invite Earn</b> button below to share your link!</i>"
+          "📜 <b>ACCESS DENIED</b>\n\n"
+          "You need owner approval to use this command! Get premium below.\n\n"
+          "👑 <b>PREMIUM PLANS</b>\n"
+          "• <b>3 Days</b> — ⭐ 100 Stars\n"
+          "• <b>7 Days</b> — ⭐ 200 Stars\n"
+          "• <b>1 Month</b> — 🖼️ 500 Stars\n"
+          "• <b>Lifetime</b> — 🖼️ 1 NFT\n\n"
+          f"👑 <b>Owner:</b> {OWNER_USERNAME}\n"
+          "<i>Click the button below to buy premium.</i>"
       )
       edit_message_text(
           chat_id,
           message_id,
           lock_msg,
-          reply_markup=get_back_keyboard(),
+          reply_markup=get_buy_premium_keyboard(),
           parse_mode="HTML",
       )
       return
@@ -728,7 +736,7 @@ def handle_callback(callback):
       secs = remaining_seconds % 60
       answer_callback_query(callback_id, f"⏳ Cooldown: {mins}m {secs}s left")
       cooldown_msg = (
-          "⏳ <b>[ sᴇʀᴠᴇʀ ᴄᴏᴏʟᴅᴏᴡɴ ᴀᴄᴛɪᴠᴇ ]</b>\n\n"
+          "⏳ <b>[ SERVER COOLDOWN ACTIVE ]</b>\n\n"
           "<blockquote>Rate limits are active to safeguard network gateways."
           " Only 1 request allowed per 15 minutes.</blockquote>\n\n"
           f"🕒 <b>Time Remaining:</b> <code>{mins}m {secs}s</code>"
@@ -747,7 +755,7 @@ def handle_callback(callback):
     edit_message_text(
         chat_id,
         message_id,
-        "⚡ <b>[ ᴘᴇʀᴍᴀɴᴇɴᴛ ʙᴀɴ ]</b>\n\n<i>Enter target number with country"
+        "💥 <b>[ PERMANENT BAN ]</b>\n\n<i>Enter target number with country"
         " code (e.g. +91XXXXXXXXXX):</i>",
         reply_markup=get_back_keyboard(),
         parse_mode="HTML",
@@ -759,7 +767,7 @@ def handle_callback(callback):
     edit_message_text(
         chat_id,
         message_id,
-        "⏳ <b>[ ᴛᴇᴍᴘᴏʀᴀʀʏ ʙᴀɴ ]</b>\n\n<i>Enter target number with country"
+        "⏳ <b>[ TEMPORARY BAN ]</b>\n\n<i>Enter target number with country"
         " code:</i>",
         reply_markup=get_back_keyboard(),
         parse_mode="HTML",
@@ -771,7 +779,7 @@ def handle_callback(callback):
     edit_message_text(
         chat_id,
         message_id,
-        "🚨 <b>[ ᴍᴀss ʀᴇᴘᴏʀᴛ ]</b>\n\n<i>Enter target number with country"
+        "🚨 <b>[ MASS REPORT ]</b>\n\n<i>Enter target number with country"
         " code:</i>",
         reply_markup=get_back_keyboard(),
         parse_mode="HTML",
@@ -783,7 +791,7 @@ def handle_callback(callback):
     edit_message_text(
         chat_id,
         message_id,
-        "🔓 <b>[ ᴜɴʙᴀɴ ᴇxᴇᴄᴜᴛɪᴏɴ ]</b>\n\n<i>Enter target number to unban:</i>",
+        "🔓 <b>[ UNBAN EXECUTION ]</b>\n\n<i>Enter target number to unban:</i>",
         reply_markup=get_back_keyboard(),
         parse_mode="HTML",
     )
@@ -792,15 +800,15 @@ def handle_callback(callback):
   elif data == "action_get_premium":
     answer_callback_query(callback_id, "VIP Pricing")
     premium_pricing_text = (
-        "👑 ─────── <b>[ ᴘʀᴇᴍɪᴜᴍ ᴀᴄᴄᴇss VIP ]</b> ─────── 👑\n\n"
-        "<blockquote>Unlock unlimited access to all Permanent Ban, Temporary"
-        " Ban & Mass Report tools without referral restrictions!</blockquote>\n\n"
-        "┌── 💎 <b><u>OFFICIAL PRICING</u></b>\n"
-        "├ 🇮🇳 <b>INR (UPI):</b> <code>₹799 RS</code>\n"
-        "├ 🌐 <b>USDT (Crypto):</b> <code>$9 USDT</code>\n"
-        "└ ⚡ <b>Validity:</b> <code>Lifetime Premium VIP Access</code>\n\n"
-        "❖ ───────────────────────────── ❖\n"
-        f"📩 <b>CONTACT OWNER:</b> @{OWNER_USERNAME}"
+        "📜 <b>ACCESS DENIED</b>\n\n"
+        "You need owner approval to use this command! Get premium below.\n\n"
+        "👑 <b>PREMIUM PLANS</b>\n"
+        "• <b>3 Days</b> — ⭐ 100 Stars\n"
+        "• <b>7 Days</b> — ⭐ 200 Stars\n"
+        "• <b>1 Month</b> — 🖼️ 500 Stars\n"
+        "• <b>Lifetime</b> — 🖼️ 1 NFT\n\n"
+        f"👑 <b>Owner:</b> {OWNER_USERNAME}\n"
+        "<i>Click the button below to buy premium.</i>"
     )
     edit_message_text(
         chat_id,
@@ -813,7 +821,7 @@ def handle_callback(callback):
   elif data == "action_bot_status":
     answer_callback_query(callback_id, "System Online")
     status_text = (
-        "⚙️ ─────── <b>[ ɴᴇᴛᴡᴏʀᴋ sᴛᴀᴛᴜs ]</b> ─────── ⚙️\n\n"
+        "⚙️ ─────── <b>[ NETWORK STATUS ]</b> ─────── ⚙️\n\n"
         "┌── 🛡️ <b><u>SYSTEM METRICS</u></b>\n"
         "├ 🟢 <b>API Node:</b> Online & Operational\n"
         "├ ⚡ <b>Latency:</b> 0.012 ms\n"
@@ -833,8 +841,8 @@ def handle_callback(callback):
     answer_callback_query(callback_id, "Referral Panel")
     ref_link = f"https://t.me/{BOT_USERNAME}?start={user_id}"
     ref_text = (
-        "💎 ─────── <b>[ ʀᴇғᴇʀʀᴀʟ ᴘᴀɴᴇʟ ]</b> ─────── 💎\n\n"
-        "<blockquote>Invite 10 users to unlock full access to all ban & unban"
+        "💎 ─────── <b>[ REFERRAL PANEL ]</b> ─────── 💎\n\n"
+        "<blockquote>Invite 15 users to unlock full access to all ban & unban"
         " modules.</blockquote>\n\n"
         "┌── 🔗 <b><u>YOUR LINK</u></b>\n"
         f"└ <code>{ref_link}</code>\n\n"
@@ -853,19 +861,16 @@ def handle_callback(callback):
   elif data == "go_back":
     answer_callback_query(callback_id, "Returning...")
     status_str = (
-        "💎 ᴘʀᴇᴍɪᴜᴍ ᴀᴄᴄᴇss"
+        "💎 PREMIUM ACCESS"
         if has_premium_access(user_id)
-        else "🔒 ғʀᴇᴇ ᴛɪᴇʀ (Needs 10 Invites)"
+        else f"❌ NO PREMIUM"
     )
     welcome_caption = (
-        "❖ ─────── <b>[ ɴᴏ功ʙɪᴛᴀ ᴄᴏʀᴇ ]</b> ─────── ❖\n\n"
-        "┌── 📊 <b><u>USER PROFILE</u></b>\n"
-        f"├ 👤 <b>User ID:</b> <code>{user_id}</code>\n"
-        f"├ 👑 <b>Status:</b> <b>{status_str}</b>\n"
-        f"└ 🚀 <b>Referrals:</b>"
-        f" <code>{ref_count}/{REQUIRED_REFERRALS}</code>\n\n"
-        "❖ ───────────────────────────── ❖\n"
-        "👇 <i>Select an operation command below:</i>"
+        "⚡ <b>NOBITA BAN X UNBAN PREMIUM BOT</b> ⚡\n\n"
+        "Welcome! Select an option below to start:\n\n"
+        f"👤 <b>Your ID:</b> <code>{user_id}</code>\n"
+        f"👑 <b>Status:</b> <b>{status_str}</b>\n"
+        f"🚀 <b>Referrals:</b> <code>{ref_count}/{REQUIRED_REFERRALS}</code>"
     )
     edit_message_text(
         chat_id,
